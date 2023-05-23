@@ -26,12 +26,12 @@ app.use(express.static(__dirname));
 io.on('connection', function (socket) {
 
 
-  socket.on('new-user-joined', (name) => {
+  socket.on('new-user-joined', (user) => {
 
-    // console.log("new user", name);
-    users[socket.id] = name;
+     console.log("new user", user.name);
+    users[socket.id] = user.name;
 
-    socket.broadcast.emit('user-joined', name)
+    socket.broadcast.emit('user-joined', user)
   })
   socket.on('join', (data) => {
     socket.join(data.room);
@@ -48,9 +48,9 @@ io.on('connection', function (socket) {
   socket.on('send', selectedUserRoomId => {
     socket.broadcast.emit('recieve', { roomId: selectedUserRoomId })
   })
-  socket.on('disconnect', message => {
-    socket.broadcast.emit('left', users[socket.id]);
-    delete users[socket.id]
+  socket.on('disconnect', data => {
+    socket.broadcast.emit('left', data);
+    // delete users[socket.id]
   })
 })
 
