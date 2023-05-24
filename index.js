@@ -4,7 +4,11 @@ var mongoose = require('mongoose');
 var dbUrl = 'mongodb://localhost:27017/demo';
 var bodyParser = require('body-parser')
 mongoose.connect(dbUrl)
-pschema = mongoose.Schema({ name: String, message: String, phone: Number });
+pschema = mongoose.Schema({ roomId: String,chats:[{
+    user:String,
+    message:String,
+    phone:String
+}] });
 pModel = mongoose.model("pModel", pschema, "test");
 
 const app = require('express')();
@@ -61,10 +65,20 @@ app.get('/messages', async (req, res) => {
 })
 
 app.post('/messages', async (req, res) => {
+  console.log(req.body)
   var message = new pModel(req.body);
 
   let result = await message.save();
-  io.emit('message', req.body);
+  //io.emit('message', req.body);
+  if (result) {
+    console.log(result)
+    res.send(result)
+  }
+})
+app.put('/messages', async (req, res) => {
+  console.log(req.body)
+  var result = await pModel.updateOne(new req.body._id, { $set: req.body });
+  //io.emit('message', req.body);
   if (result) {
     console.log(result)
     res.send(result)
