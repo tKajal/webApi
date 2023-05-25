@@ -3,6 +3,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var dbUrl = 'mongodb://localhost:27017/demo';
 var bodyParser = require('body-parser')
+const  ObjectID = require('mongodb').ObjectId;
 mongoose.connect(dbUrl)
 pschema = mongoose.Schema({ roomId: String,chats:[{
     user:String,
@@ -77,7 +78,8 @@ app.post('/messages', async (req, res) => {
 })
 app.put('/messages', async (req, res) => {
   console.log(req.body)
-  var result = await pModel.updateOne(new req.body._id, { $set: req.body });
+  var result = await pModel.updateOne({_id:new  
+    ObjectID(req.body._id)}, { $set: req.body });
   //io.emit('message', req.body);
   if (result) {
     console.log(result)
