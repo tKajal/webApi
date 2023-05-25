@@ -5,7 +5,7 @@ var dbUrl = 'mongodb://localhost:27017/demo';
 var bodyParser = require('body-parser')
 const  ObjectID = require('mongodb').ObjectId;
 mongoose.connect(dbUrl)
-pschema = mongoose.Schema({ roomId: String,chats:[{
+pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
     user:String,
     message:String,
     phone:String
@@ -85,6 +85,21 @@ app.put('/messages', async (req, res) => {
     console.log(result)
     res.send(result)
   }
+})
+
+app.put('/count',async(req,res)=>{
+  var result = await pModel.updateOne(
+    {roomId:req.body.roomId, from:req.body.from}, { $set: {count:req.body.count} });
+  //io.emit('message', req.body);
+  if (result) {
+    console.log(result)
+    res.send(result)
+  }
+})
+app.get('/count/:roomId/:from', async (req, res) => {
+  let data = await pModel.find({roomId:req.params.roomId, from:req.params.from})
+  res.send(data.count)
+  console.log(data)
 })
 
 httpServer.listen(port, () => console.log(`listening on port ${port}`));
