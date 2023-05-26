@@ -12,6 +12,18 @@ pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
 }] });
 pModel = mongoose.model("pModel", pschema, "test");
 
+userschema = mongoose.Schema({ id: Number,
+  name: String,
+  phone: String,
+  image: String,
+  roomId: {
+    type:Number,
+    of: Number
+},
+countData:[{id:String,count:Number}]
+});
+userModel = mongoose.model("userModel", userschema, "users");
+
 const app = require('express')();
 const httpServer = require('http').createServer(app);
 const cors = require('cors');
@@ -102,4 +114,20 @@ app.get('/count/:roomId/:from', async (req, res) => {
   console.log(data)
 })
 
+app.get('/users/:id',async(req,res)=>{
+  let data= await userModel.find({user:req.params.id})
+  res.send(data)
+  console.log(data)
+})
+app.post('/users', async (req, res) => {
+  console.log(req.body)
+  var data = new userModel(req.body);
+
+  let result = await data.save();
+  //io.emit('message', req.body);
+  if (result) {
+    console.log(result)
+    res.send(result)
+  }
+})
 httpServer.listen(port, () => console.log(`listening on port ${port}`));
