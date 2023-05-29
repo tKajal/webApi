@@ -101,7 +101,7 @@ app.put('/messages', async (req, res) => {
 
 app.put('/count',async(req,res)=>{
   var result = await pModel.updateOne(
-    {roomId:req.body.roomId, from:req.body.from}, { $set: {count:req.body.count} });
+    {roomId:req.body.roomId}, { $set: {count:req.body.count} });
   //io.emit('message', req.body);
   if (result) {
     console.log(result)
