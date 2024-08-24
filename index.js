@@ -1,6 +1,7 @@
 
 var express = require('express');
 var mongoose = require('mongoose');
+const cors = require('cors');
 var dbUrl = 'mongodb://localhost:27017/demo';
 var bodyParser = require('body-parser')
 const  ObjectID = require('mongodb').ObjectId;
@@ -10,6 +11,15 @@ pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
     message:String,
     phone:String
 }] });
+
+
+// Custom middleware to set CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 pModel = mongoose.model("pModel", pschema, "test");
 
 userschema = mongoose.Schema({ id: Number,
