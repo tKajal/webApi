@@ -13,9 +13,6 @@ pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
 }] });
 
 
-// Use CORS middleware
-// app.use(cors());
-
 pModel = mongoose.model("pModel", pschema, "test");
 
 userschema = mongoose.Schema({ id: Number,
@@ -32,10 +29,29 @@ userModel = mongoose.model("userModel", userschema, "users");
 
 const app = require('express')();
 const httpServer = require('http').createServer(app);
-const cors = require('cors');
-app.use(cors({
-  origin: '*'
-}));
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:4200',  // Local development URL
+  'https://web-ufuk.vercel.app'  // Production frontend URL
+];
+
+// Set up CORS middleware
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Check if the request's origin is in the allowed origins list or if there is no origin (like some server-to-server requests)
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);  // Allow the request
+    } else {
+      callback(new Error('Not allowed by CORS'));  // Reject the request
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,  // Enable to allow cookies and credentials if needed
+  optionsSuccessStatus: 204 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
+
 const io = require('socket.io')(httpServer, {
   cors: { origin: '*' }
 });
