@@ -14,7 +14,7 @@ pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
 
 
 // Use CORS middleware
-app.use(cors());
+// app.use(cors());
 
 pModel = mongoose.model("pModel", pschema, "test");
 
