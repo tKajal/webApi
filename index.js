@@ -13,13 +13,9 @@ pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
 }] });
 
 
-// Custom middleware to set CORS headers
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
+// Use CORS middleware
+app.use(cors());
+
 pModel = mongoose.model("pModel", pschema, "test");
 
 userschema = mongoose.Schema({ id: Number,
