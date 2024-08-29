@@ -1,5 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
+const cors = require('cors');
 var dbUrl = 'mongodb://localhost:27017/demo';
 var bodyParser = require('body-parser')
 const  ObjectID = require('mongodb').ObjectId;
@@ -24,10 +25,7 @@ countData:[{id:String,count:Number}]
 userModel = mongoose.model("userModel", userschema, "users");
 const app = require('express')();
 const httpServer = require('http').createServer(app);
-const cors = require('cors');
-app.use(cors({
-  origin: '*'
-}));
+app.use(cors({ origin: '*' }));
 const io = require('socket.io')(httpServer, {
   cors: { origin: '*' }
 });
@@ -61,12 +59,12 @@ io.on('connection', function (socket) {
     // delete users[socket.id]
   })
 })
-app.get('/messages', async (req, res) => {
+app.get('api/messages', async (req, res) => {
   let data = await pModel.find(req.phone)
   res.send(data)
   console.log(data)
 })
-app.post('/messages', async (req, res) => {
+app.post('api/messages', async (req, res) => {
   console.log(req.body)
   var message = new pModel(req.body);
   let result = await message.save();
@@ -76,7 +74,7 @@ app.post('/messages', async (req, res) => {
     res.send(result)
   }
 })
-app.put('/messages', async (req, res) => {
+app.put('api/messages', async (req, res) => {
   console.log(req.body)
   var result = await pModel.updateOne({_id:new  
     ObjectID(req.body._id)}, { $set: req.body });
@@ -86,7 +84,7 @@ app.put('/messages', async (req, res) => {
     res.send(result)
   }
 })
-app.put('/count',async(req,res)=>{
+app.put('api/count',async(req,res)=>{
   var result = await pModel.updateOne(
     {roomId:req.body.roomId}, { $set: {count:req.body.count} });
   //io.emit('message', req.body);
@@ -95,17 +93,17 @@ app.put('/count',async(req,res)=>{
     res.send(result)
   }
 })
-app.get('/count/:roomId/:from', async (req, res) => {
+app.get('api/count/:roomId/:from', async (req, res) => {
   let data = await pModel.find({roomId:req.params.roomId, from:req.params.from})
   res.send(data.count)
   console.log(data)
 })
-app.get('/users/:id',async(req,res)=>{
+app.get('api/users/:id',async(req,res)=>{
   let data= await userModel.find({user:req.params.id})
   res.send(data)
   console.log(data)
 })
-app.post('/users', async (req, res) => {
+app.post('api/users', async (req, res) => {
   console.log(req.body)
   var data = new userModel(req.body);
   let result = await data.save();
