@@ -1,64 +1,79 @@
-var express = require('express');
-var mongoose = require('mongoose');
+const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-var dbUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/demo';
-var bodyParser = require('body-parser')
-const  ObjectID = require('mongodb').ObjectId;
-mongoose.connect(dbUrl)
-pschema = mongoose.Schema({ roomId: String,from:Number,count:Number,chats:[{
-    user:String,
-    message:String,
-    phone:String
-}] });
-pModel = mongoose.model("pModel", pschema, "test");
+const dbUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/demo';
+const bodyParser = require('body-parser');
+const ObjectID = require('mongodb').ObjectId;
 
-userschema = mongoose.Schema({ id: Number,
+mongoose.connect(dbUrl);
+
+const pschema = mongoose.Schema({
+  roomId: String,
+  from: Number,
+  count: Number,
+  chats: [
+    {
+      user: String,
+      message: String,
+      phone: String,
+    },
+  ],
+});
+
+const pModel = mongoose.model('pModel', pschema, 'test');
+
+const userschema = mongoose.Schema({
+  id: Number,
   name: String,
   phone: String,
   image: String,
   roomId: {
-    type:Number,
-    of: Number
-},
-countData:[{id:String,count:Number}]
+    type: Number,
+    of: Number,
+  },
+  countData: [{ id: String, count: Number }],
 });
-userModel = mongoose.model("userModel", userschema, "users");
-const app = require('express')();
+
+const userModel = mongoose.model('userModel', userschema, 'users');
+
+const app = express();
 const httpServer = require('http').createServer(app);
 app.use(cors({ origin: '*' }));
 const io = require('socket.io')(httpServer, {
-  cors: { origin: '*' }
+  cors: { origin: '*' },
 });
 const port = 3000;
 const users = {};
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
-//listen incoming events
+
 io.on('connection', function (socket) {
   socket.on('new-user-joined', (user) => {
-     console.log("new user", user.name);
+    console.log('new user', user.name);
     users[socket.id] = user.name;
-    socket.broadcast.emit('user-joined', user)
-  })
+    socket.broadcast.emit('user-joined', user);
+  });
+
   socket.on('join', (data) => {
     socket.join(data.room);
     socket.broadcast.to(data.room).emit('user joined');
   });
+
   socket.on('message', (data) => {
     io.in(data.room).emit('new message', { user: data.user, message: data.message });
   });
-  // socket.on('send', data => {
-  //   socket.broadcast.emit('recieve', { user: data.user, message: data.message })
-  // })
-  socket.on('send', selectedUserRoomId => {
-    socket.broadcast.emit('recieve', { roomId: selectedUserRoomId })
-  })
-  socket.on('disconnect', data => {
+
+  socket.on('send', (selectedUserRoomId) => {
+    socket.broadcast.emit('recieve', { roomId: selectedUserRoomId });
+  });
+
+  socket.on('disconnect', (data) => {
     socket.broadcast.emit('left', data);
-    // delete users[socket.id]
-  })
-})
+  });
+});
+
 app.get('/messages', async (req, res) => {
   let data = await pModel.find(req.phone);
   res.send(data);
@@ -100,7 +115,7 @@ app.get('/users/:id', async (req, res) => {
 });
 
 app.get('/test', async (req, res) => {
-  res.send({ "test": 'iuri' });
+  res.send({ test: 'iuri' });
   res.end();
 });
 
@@ -113,4 +128,8 @@ app.post('/users', async (req, res) => {
     res.send(result);
   }
 });
+
 httpServer.listen(port, () => console.log(`listening on port ${port}`));
+
+// Export the app for Vercel
+module.exports = app;
