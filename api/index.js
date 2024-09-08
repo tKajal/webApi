@@ -1,7 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dbUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/demo';
+const dbUrl = process.env.MONGO_URL;
 const bodyParser = require('body-parser');
 const ObjectID = require('mongodb').ObjectId;
 
@@ -42,7 +43,7 @@ app.use(cors({ origin: '*' }));
 const io = require('socket.io')(httpServer, {
   cors: { origin: '*' },
 });
-const port = 3000;
+const port = process.env.port;
 const users = {};
 
 app.use(bodyParser.json());
