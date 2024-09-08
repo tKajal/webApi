@@ -58,7 +58,7 @@
          //    data.forEach(addMessages);
          // })
          let msgData;
-          $.get('http://localhost:3000/messages', (data) => {
+          $.get('https://web-hhch2hma9-kajals-projects-88e55b5e.vercel.app/messages', (data) => {
              console.log(data)
              msgData=data
             //  data.forEach(addMessages);
@@ -74,7 +74,7 @@
       }
 
       function sendMessage(message) {
-         $.post('http://localhost:3000/messages', message)
+         $.post('https://web-hhch2hma9-kajals-projects-88e55b5e.vercel.app/messages', message)
       }
    </script>
 </body>
